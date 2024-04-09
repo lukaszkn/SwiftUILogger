@@ -115,6 +115,12 @@ open class SwiftUILogger: ObservableObject {
     
     ///
     @Published var filteredTags: OrderedSet<String>
+    
+    ///
+    public var logToConsole: Bool = false
+    
+    ///
+    public var enabled: Bool = true
 
     ///
     @Published public var logs: [Event]
@@ -152,13 +158,15 @@ open class SwiftUILogger: ObservableObject {
     ///
     public init(
         name: String? = nil,
-        logs: [Event] = []
+        logs: [Event] = [],
+        logToConsole: Bool = false
     ) {
         self.lock = NSLock()
         self.name = name
         self.logs = logs
         
         self.filteredTags = []
+        self.logToConsole = logToConsole
     }
     
     ///
@@ -170,6 +178,10 @@ open class SwiftUILogger: ObservableObject {
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {
+        if !enabled {
+            return
+        }
+        
         guard Thread.isMainThread else {
             return DispatchQueue.main.async {
                 self.log(level: level, message: message, error: error, tags: tags, file, line)
@@ -189,12 +201,20 @@ open class SwiftUILogger: ObservableObject {
                 line
             )
         )
+        
+        if logToConsole {
+            if let event = logs.last {
+                let date = Event.dateFormatter.string(from: event.dateCreated)
+                let time = Event.timeFormatter.string(from: event.dateCreated)
+                print("\(date) \(time) \(event.level.emoji.description): \(event.message)")
+            }
+        }
     }
     
     ///
     open func success(
         message: String,
-        tags: [any LogTagging],
+        tags: [any LogTagging] = [],
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {
@@ -211,7 +231,7 @@ open class SwiftUILogger: ObservableObject {
     ///
     open func info(
         message: String,
-        tags: [any LogTagging],
+        tags: [any LogTagging] = [],
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {
@@ -228,7 +248,7 @@ open class SwiftUILogger: ObservableObject {
     ///
     open func warning(
         message: String,
-        tags: [any LogTagging],
+        tags: [any LogTagging] = [],
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {
@@ -246,7 +266,7 @@ open class SwiftUILogger: ObservableObject {
     open func error(
         message: String,
         error: Error?,
-        tags: [any LogTagging],
+        tags: [any LogTagging] = [],
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {
@@ -264,7 +284,7 @@ open class SwiftUILogger: ObservableObject {
     open func fatal(
         message: String,
         error: Error?,
-        tags: [any LogTagging],
+        tags: [any LogTagging] = [],
         _ file: StaticString = #fileID,
         _ line: Int = #line
     ) {

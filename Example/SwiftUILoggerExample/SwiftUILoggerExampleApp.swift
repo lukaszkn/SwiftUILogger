@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftUILogger
 
-let logger = SwiftUILogger(name: "Demo")
+let logger = SwiftUILogger(name: "Demo", logToConsole: true)
 
 @main
 struct SwiftUILoggerExampleApp: App {
