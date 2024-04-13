@@ -64,6 +64,14 @@ open class SwiftUILogger: ObservableObject {
             return formatter
         }()
         
+        static let dateTimeFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            
+            return formatter
+        }()
+        
         ///
         public let id: UUID
         
@@ -141,10 +149,9 @@ open class SwiftUILogger: ObservableObject {
         
         return displayedLogs
             .map { (event) -> String in
-                let date = Event.dateFormatter.string(from: event.dateCreated)
-                let time = Event.timeFormatter.string(from: event.dateCreated)
+                let dateTime = Event.dateTimeFormatter.string(from: event.dateCreated)
                 let emoji = event.level.emoji.description
-                let eventMessage = "\(date) \(time) \(emoji): \(event.message) (File: \(event.metadata.file)@\(event.metadata.line))"
+                let eventMessage = "\(dateTime) \(emoji): \(event.message) (File: \(event.metadata.file)@\(event.metadata.line))"
                 
                 guard let error = event.error else {
                     return eventMessage
@@ -204,9 +211,8 @@ open class SwiftUILogger: ObservableObject {
         
         if logToConsole {
             if let event = logs.last {
-                let date = Event.dateFormatter.string(from: event.dateCreated)
-                let time = Event.timeFormatter.string(from: event.dateCreated)
-                print("\(date) \(time) \(event.level.emoji.description): \(event.message)")
+                let dateTime = Event.dateTimeFormatter.string(from: event.dateCreated)
+                print("\(dateTime) \(event.level.emoji.description): \(event.message)")
             }
         }
     }

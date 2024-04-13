@@ -9,17 +9,14 @@ struct LogEventView: View {
     var body: some View {
         if isMinimal {
             HStack {
-                let date = Event.dateFormatter.string(from: event.dateCreated)
-                let time = Event.timeFormatter.string(from: event.dateCreated)
-                Text("\(date) \(time) \(event.level.emoji.description): \(event.message)")
-                    .font(.body)
-                    .padding(.leading, 4)
+                let dateTime = Event.dateTimeFormatter.string(from: event.dateCreated)
+                Text("\(dateTime) \(event.level.emoji.description): \(event.message)")
+                    .font(.footnote)
                 Spacer()
             }
             .frame(
                 maxWidth: .infinity
             )
-            .padding(.vertical)
         } else {
             VStack {
                 HStack(spacing: 8) {
